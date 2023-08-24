@@ -258,3 +258,114 @@ console.log(`Hi ${name}`)
 
 
 
+
+# Node.js Package Manager & Built-ins
+
+* NPM is a standard package manager for NodeJS
+* Provides a way of downloading and managing dependencies for both the frontend and backend applications using JavaScript
+* Alternatives of NPM include yarn and pnpm
+### Most significant NPM cli commands
+1. `npm init`
+2. `npm install`
+3. `npm install <package_name> [-g, --save-dev, --no-save, --save-optional, --no-optional]`
+4. `npm install <package_name>@version`
+5. `npm update`
+6. `npm update <package_name>`
+7. `npm run <task-name>`
+8. `npm list`
+9. `npm view <package_name> version`
+10. `npm uninstall <package_name>`
+11. `npm help`
+
+### Semantic versioning
+"express": ^4.18.1
+x: the first digit is the major version
+y: the second digit is the minor version
+z: the third digit is patch version
+
+^4.18.1 - means only update the minor or patch version
+~4.18.1 - means only update only patch version
+
+### How to export a functionality from a Node.js file
+A NodeJS file can export its functionality by adding module export or export property
+Adding module export in car.js file:
+```js
+const ford = {
+    branch: "Ford",
+    model: "Fiesta"
+};
+module.exports = ford;
+```
+In the index.js file:
+```js
+const car = require("./car")
+console.log(car)
+// Outputs
+// { branch: 'Ford', model: 'Fiesta' }
+```
+
+Using the exports property as an object in car.js file:
+```js
+// Objects
+const ford = {
+    branch: "Ford",
+    model: "Fiesta"
+};
+const tesla = {
+    branch: "Tesla",
+    model: "Model 3"
+};
+
+exports.data = {ford, tesla};
+```
+
+In the index.js file:
+```js
+const car = require("./car")
+console.log(car)
+// Outputs
+// {
+//   data: {
+//     ford: { branch: 'Ford', model: 'Fiesta' },
+//     tesla: { branch: 'Tesla', model: 'Model 3' }
+//   }
+// }
+```
+
+We can also destructure the data exports property in index.js by doing:
+```js
+const { data } = require("./car")
+console.log(data)
+
+// Outputs
+// {
+//   ford: { branch: 'Ford', model: 'Fiesta' },  
+//   tesla: { branch: 'Tesla', model: 'Model 3' }
+// }
+```
+
+We can export each object individually in the car.js file like this:
+```js
+exports.ford = {
+    branch: "Ford",
+    model: "Fiesta"
+};
+exports.tesla = {
+    branch: "Tesla",
+    model: "Model 3"
+};
+```
+
+And then in the index.js file, we use them like this:
+```js
+const {ford, tesla} = require("./car")
+console.log(ford)
+console.log(tesla)
+
+// Outputs
+// { branch: 'Ford', model: 'Fiesta' }
+// { branch: 'Tesla', model: 'Model 3' }
+```
+
+# Node.js Error Handling
+
