@@ -529,3 +529,144 @@ someFunction();
 
 
 # Node.js File System and  Path Modules
+
+### Useful methods of the path module
+
+```js
+// Importing the path module
+const path = require("path")
+// Defining the file path
+const filepath = "C:/Users/Charles/Documents/nodejs-tutorial/files/sample.txt"
+
+// How to get directory name
+console.log(path.dirname(filepath))
+
+// Getting the root directory of the project
+console.log(__dirname)
+
+// How to get the base name
+console.log(path.basename(filepath))
+
+// Getting the name of the file we are currently working on
+console.log(__filename)
+
+// How to get the extension name
+console.log(path.extname(filepath))
+```
+
+Using the join method:
+```js
+const path = require("path")
+const filepath = "C:/Users/Charles/Documents/nodejs-tutorial/files/sample.txt"
+
+const sampleFile = "sample.txt";
+console.log(path.join(path.dirname(filepath), sampleFile))
+```
+
+### The file system module
+
+```js
+const fs = require("fs");
+// lists all the methods of the fs module
+console.log(fs)
+```
+
+```js
+// Reading from a file -Asynchronously
+fs.readFile(filepath, "utf-8", (err, data) => {
+    if (err) throw new Error("Something went wrong!");
+console.log(data);
+})
+// Outputs
+// Peints the text in the file
+```
+
+```js
+// Reading from a file -Synchronously
+try{
+    // the second way of finding the file path using dirname replaces using the full path
+    const data = fs.readFileSync(path.join(__dirname, "files", "sample.txt"), "utf-8");
+    console.log(data);
+}catch (err){
+    console.log(err);
+}
+```
+
+```js
+//  Using the fs promise
+const fsPromise = require("fs").promises;
+const fileReading = async() => {
+    try{
+        const data = await fsPromise.readFile(filepath, {encoding: "utf-8"})
+        console.log("FS Promises: ", data);
+    }catch(err){
+        console.log(err)
+    }
+}
+fileReading()
+```
+
+#### writing into a file
+
+```js
+const txtFile = path.join(__dirname, "files", "text.txt")
+const content = "I love learning javascript programming"
+
+// Writing into a file -Asynchronously
+fs.writeFile(txtFile, content, (err) => {
+    if (err) throw new Error("Something went wrong!");
+console.log("Write operation completed successfully");
+
+// Reading after writing on the file
+fs.readFile(txtFile, "utf-8", (err, data) => {
+    if (err) throw new Error(err);
+    console.log(data)
+	})
+})
+// Same approach to writeFileSync
+```
+
+If we want to do multiple operations like reading a file, writing a file, and appending a file, it will become very tedious because you will have a lot of callbacks. A better approach is to use fspromises.  Rewriting the code above with the fspromise:
+
+```js
+// A cleaner way is using fspromises
+const txtFile = path.join(__dirname, "files", "text.txt")
+const content = "I love learning javascript programming"
+
+const fsPromise = require("fs").promises;
+const writingInFile = async () => {
+    try{
+        await fsPromise.writeFile(txtFile, content);
+        await fsPromise.appendFile(txtFile, "\nthis appending file")
+        const data = await fsPromise.readFile(txtFile)
+        console.log(data.toString())
+    }catch(err){
+        console.log(err)
+    }
+}
+
+writingInFile()
+```
+
+```js
+// Using the a+ flag to add smth at the end of the file
+        await fsPromise.writeFile(txtFile, "\n its awesome", {
+            flag: "a+",
+        });
+```
+
+How to remain a file
+```js
+// To rename the file, first argument old name, second argument new name
+        await fs.promises.rename(txtFile, path.join(__dirname, "files", "newtxt.txt"))
+        const data = await fsPromise.readFile(path.join(__dirname, "files", "newtxt.txt"))
+```
+
+
+# Async vs Sync Programming
+
+
+
+
+
+
