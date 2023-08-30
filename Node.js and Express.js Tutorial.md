@@ -369,3 +369,163 @@ console.log(tesla)
 
 # Node.js Error Handling
 
+Errors in NodeJS are handled through exceptions with the keyword throw. 6 different ways to handle the errors:
+1. Using Error Object
+2. Using Custom Error objects
+3. Using try and catch
+4. Uncaught exceptions
+5. Exceptions in promises
+6. Using Async and Await
+
+### Using the Error Object
+
+```js
+const error = new Error("Something went wrong")
+console.log(error.stack)
+// Shows the error stacktrace
+```
+```js
+const error = new Error("Something went wrong")
+console.log(error.message)
+// show only the error message
+```
+
+An alternative to console.log is using the throw keyword
+```js
+// Starts with error message and shows the stack trace
+throw new Error("I am error object")
+```
+
+### Using Custom Error Object
+
+We can create a custom error object by extending the error object.
+We can do so by creating a new file called CustomError.js and write the following code:
+```js
+class CustomError extends Error {
+    constructor(message){
+        super(message);
+    }
+}
+
+module.exports = {CustomError}
+```
+
+Then in we can import the CustomError object and use it like this:
+```js
+const { CustomError } = require('./CustomError');
+throw new CustomError("This is a custom error");
+// It will show a stack trace beginning with:
+// CustomError: This is a custom error
+```
+
+### Handling the exception using try and catch
+
+```js
+try{
+    doSomething();
+}catch (e){
+    console.log("Error occurred");
+    console.log(e);
+}
+// When this code runs, it will throw an error with following message
+// Error occurred
+// ReferenceError: doSomething is not defined
+// Followed by stack trace
+```
+
+
+When I define the doSomething function, as below, the code will not throw an error:
+```js
+try{
+    doSomething();
+}catch (e){
+    console.log("Error occurred");
+    console.log(e);
+}
+
+function doSomething(){
+    console.log("I am from doSomething function")
+}
+
+// Outputs
+// I am from doSomething function
+```
+
+If there is an error while executing the function, the try catch will throw an exception. For example, the code below tries to use fetch method but an error occurs:
+
+```js
+try{
+    doSomething();
+}catch (e){
+    console.log("Error occurred");
+    console.log(e);
+}
+
+function doSomething(){
+    const data = fetch("localhost:300/api");
+}
+// This code will throw an error showing fetch failed
+```
+
+### Uncaught Exceptions
+
+This catches errors which are not known. Example code:
+
+```js
+function doSomething(){
+    const data = fetch("localhost:300/api");
+}
+
+// Uncaught exception
+process.on("UncaughtException", (err) => {
+    console.log("There was uncaught exception", err);
+    // exiting the flow of the code
+    process.exit(1);
+})
+
+doSomething()
+```
+
+### Exceptions with Promises
+
+```js
+const promise = new Promise((resolve, reject) => {
+    if(false){
+        resolve(doSomething());
+    }
+    else {
+        reject(doSomething());
+    }
+})
+
+promise.then((val) => {
+    console.log(val)
+}).catch((err) => {
+    console.log("Error Occurred");
+    console.log(err);
+});
+```
+
+The promise is resolved [accepted] when the promise is true. If false, the promise is rejected. IF resolved, the .then part is executed. Otherwise, the .catch part is executed.
+
+### Exceptions with Async and Await
+
+```js
+function doSomething(){
+    // console.log("I am from doSomething function")
+    const data = fetch("localhost:300/api")
+}
+
+const someFunction = async () => {
+    try{
+        await doSomething();
+    }catch(err) {
+        throw new CustomError(err.message);
+    }
+}
+
+someFunction();
+```
+
+
+# Node.js File System and  Path Modules
