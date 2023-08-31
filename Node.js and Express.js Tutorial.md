@@ -721,3 +721,104 @@ However, in the asynchronous code above, the Do something else does not have to 
 
 # Callbacks and Callback hell
 
+A callback function is a function which is passed as an argument into another function. The other function executes this callback function at a later point in time.
+Callbacks by themselves are not asynchronous. Example:
+
+```js
+console.log("Task start");
+function asyncTask(cb){
+    console.log("Task running");
+    cb();
+}
+asyncTask(() => console.log(name))
+console.log("Task end");
+const name = "Charles";
+
+// When this code run it runs into an error
+// Uncaught ReferenceError: Cannot access 'name' before initialization
+// This shows that callbacks are synchronous in nature
+```
+
+So we have to make the callback function to be asynchronous
+To do that, we can do things like setTimeout as shown below:
+
+```js
+console.log("Task start");
+function asyncTask(cb){
+    console.log("Task running");
+    setTimeout(cb, 0);
+}
+asyncTask(() => console.log(name))
+console.log("Task end");
+const name = "Charles";
+```
+
+The callback function will then be taken out of the execution flow, when the complete js file has been compiled, then the callback function will be called.
+
+Other ways include using promises and async await.
+
+### Good ways of handling callback errors
+We start by passing error as the first argument in the callback. It is called the error first callback
+```js
+function asyncTask(cb){
+    setTimeout(() => {
+        // If you have an error
+        // cb("Error!");
+        // If you dont have an error, the first argument will be null
+        // The second argument will be your data
+        cb(null, "This is the data from the Mkiki Server")
+    }, 0);
+}
+
+asyncTask((err, data) => {
+    if (err) {
+        throw err;
+    } else {
+        console.log("data", data)
+    }
+})
+
+// If cb("Error!"), it will print: Uncaught Error!
+// if cb(null, "data"), it will print:
+// data This is the data from the Mkiki Server
+```
+
+### Callback hell
+
+Suppose we have these two functions:
+
+```js
+function asyncTask(cb){
+    setTimeout(() => {      
+        cb(null, "This is the data from the Mkiki Server")
+    }, 0);
+}
+
+function makeAPICall(cb){
+    setTimeout(() => {
+        console.log("This is async task execution")
+    }, 0)
+}
+```
+
+The callback hell will occur callbacks are nested upon each other like this:
+```js
+makeAPICall(() => {
+    makeAPICall(() => {
+        asyncTask(() => {
+            asyncTask(() => {
+                asyncTask(() => {
+                    asyncTask(() => {})
+                })
+            })
+        })
+    })
+})
+```
+
+These nested callbacks are what is referred to as callback hell
+It means that one need to remember the sequence in which all the callbacks closes
+It is also very unreadable and hard to understand
+We use promises or async await which have a better way of writing the code and making it simpler to understand
+
+### Promises
