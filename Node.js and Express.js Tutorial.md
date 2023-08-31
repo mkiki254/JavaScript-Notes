@@ -665,8 +665,59 @@ How to remain a file
 
 # Async vs Sync Programming
 
+JavaScript is a synchronous single threaded language, but it can handle asynchronous tasks using callbacks, promises and async await.
+Example of blocking code in a synchronous programming
+```js
+console.log("Start operation")
+
+function sleep(milliseconds) {
+    let startTime = new Date().getTime();
+    console.log("Operation is running.")
+    while (new Date().getTime() < startTime + milliseconds){
+        console.log("In progress")
+    }
+    console.log("Operation is done!")
+}
+
+sleep(1000);
+
+console.log("Do something else")
+
+// Outputs
+// Start operation
+// Operation is running.
+// 7383 In progress
+// Operation is done!
+// Do something else
+```
+
+In the above code, the Do something else console had to wait for the execution of the while loop to finish thus blocking the code execution.
+
+### Converting the above synchronous code into asynchronous
+
+```js
+console.log("Start operation")
+
+function sleep(milliseconds) {
+    console.log("Operation is running.")
+    // Using a setTimout function that gets executed asynchronously
+    setTimeout(() => {
+        console.log("Operation is done!")
+    }, milliseconds)
+}
+
+sleep(1000);
+console.log("Do something else")
+
+// Outputs
+// Start operation
+// Operation is running.
+// Do something else
+// Operation is done!
+```
+
+However, in the asynchronous code above, the Do something else does not have to wait for the execution of the set Timeout function to finish, so it is executed and when the operation is done, the set Timeout function is also executed
 
 
-
-
+# Callbacks and Callback hell
 
