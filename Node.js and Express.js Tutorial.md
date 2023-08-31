@@ -822,3 +822,378 @@ It is also very unreadable and hard to understand
 We use promises or async await which have a better way of writing the code and making it simpler to understand
 
 ### Promises
+
+In layman's language, A father promises to his son that he is going to gift him a car if he scores 90% in his academics.
+
+There are two possible eventualities:
+
+1. The father fulfils the promise to his son which is called resolve
+
+2. The father fails to fulfil the promise. which is called reject or the fail
+
+Similarly in JavaScript, we have promises which take two arguments, a resolve or a reject.
+
+```js
+// Simple form of a promise in JavaScript
+const promise = new Promise((resolve, reject) => {
+    console.log("Async task execution");
+    if (true){
+        resolve()
+    }else{
+        reject()
+    }
+})
+```
+
+To interact with the promise, we use promise.then() method which accepts 2 functions. the first for the promise being resolved and the second for the promise being rejected.
+
+```js
+promise.then(
+    () => {console.log("Passed!")},
+    () => {console.log("Failed!")}
+)
+```
+
+
+We can also actually pass the values of the resolve method. Suppose we made an API call which gave us some data
+
+```js
+const promise = new Promise((resolve, reject) => {
+    console.log("Async task execution");
+    if (false){
+        const person = {name: "Charles"}
+        resolve(person)
+    }else{
+        const error = {errCode: "1001"}
+        reject(error)
+    }
+})
+
+promise.then(
+    (val) => {console.log(val)},
+    (err) => {console.log(err)}
+)
+
+// If true it will log: {name: 'Charles'}
+// If false it will log: {errCode: '1001'}
+```
+
+We can also make a catch of an error. This can work only if we missed adding error function in the .then method
+
+```js
+promise.then(
+    (val) => {console.log(val)},
+    // (err) => {console.log(err)}
+).catch(() => {console.log("Failed")})
+```
+
+We can also add .finally which will always be called when we interact with the promise
+
+```js
+promise.then(
+    (val) => {console.log(val)},
+).catch(() => {console.log("Failed")})
+.finally(() => {
+    console.log("Clean up")
+})
+```
+
+If your promise throws an error, its going to call the reject method by default and be automatically catched. Example:
+```js
+const promise = new Promise((resolve, reject) => {
+    console.log("Async task execution");
+    throw "Err"
+    ...
+})
+
+  
+
+promise.then(
+    (val) => {console.log(val)},
+).catch((err) => {console.log(err)})
+.finally(() => {
+    console.log("Clean up")
+})
+
+// Output 
+// Async task execution
+// Err
+// Clean up
+```
+
+###  Interacting with promise that is already resolved
+
+Even though the promise is resolved, we can still interact with it using the then handler. We cannot do the same with the callback function.
+Once the callback function is executed, we cannot attach anything to it and cannot interact with it.
+That's where the promises have advantage over the callback functions. Example:
+
+```js
+let p = Promise.resolve("Execution is done");
+p.then((val) => {console.log(val)})
+
+// Outputs
+// Execution is done
+```
+
+
+###  Promises are by default asynchronous
+
+Remember this example of the callback function being synchronous and how it threw an error of Uncaught ReferenceError: Cannot access 'name' before initialization:
+
+```js
+function asyncTask(cb) {
+    cb();
+}
+asyncTask(() => console.log(name))
+const name = "Charles"
+```
+
+The equivalent  Promise will look like this:
+```js
+function asyncTask() {
+    return Promise.resolve();
+}
+
+asyncTask().then(() => {console.log(name)})
+const name = "Charles"
+```
+
+The code will execute without error showing that Promises are asynchronous in nature.
+
+### Chaining in Promises
+
+Previously, we saw in the callback function that when we have to do, the logical sequence, one after the other, we result into the nesting of callback functions which give us the callback hell.
+So lets see how we do the chaining in promises:
+
+```js
+const p = Promise.resolve("done")
+// const p = Promise.reject("Failed")
+
+p.then((val) => {
+    console.log(val);
+    return "done2"
+}).then((val) => {
+    console.log(val)
+    return "done3"
+}).then((val) => {
+    console.log(val)
+}).catch((val) => {console.log(val)})
+
+// When promise is resolved and every .then returns something, the output is:
+// done 1
+// done 2
+// done 3
+
+// Supposing done3 is not returned, then the output is:
+// done 1
+// done 2
+// undefined
+
+// If the promise is already rejected, the output will be: Failed
+```
+
+When we use chaining in promises, every then has to return something, so that the other then handle will be accepted.
+For instance, when we return done2, it will be accepted  as argument of the next then function.
+If you dont return anything from the then method, then your chain will get broken.
+
+Suppose that there is a case we get an error, unlike the callbacks where we have the error first callbacks, we dont have to write the error method in each of the then method. We can write the .catch after the last .then.
+This is the advantage since the code will be more readable and understandable by the developers compared to the one in the callback hell
+
+### Promise.all
+
+There is a scenario where we want to make multiple API calls and all those API calls should call simultenously. We should not have where one API call get executed, then the second one, and so on.
+How can we do that? Example:
+
+```js
+// function assumes after making an API call, results get back after some time
+const makeApiCall = (time) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve("This API executed in: " + time)
+        }, time)
+    })
+}
+```
+
+We save all the API calls we want to make in an array
+
+```js
+let multiApiCall = [makeApiCall(1000), makeApiCall(2000), makeApiCall(500)]
+```
+
+Then use promise.all
+
+```js
+Promise.all(multiApiCall).then((values) => {
+    console.log(values)
+})
+
+// Outputs
+// ['This API executed in: 1000', 'This API executed in: 2000', 'This API executed in: 500']
+```
+
+This enables us to interact with all the promises, only once the execution of the API is done.
+These API calls in the array were executed simultenously and didn't wait for one to finish for the other to execute. 
+
+We can use the promise.race to see which was the first promise to be resolved:
+
+```js
+Promise.race(multiApiCall).then((value) => {
+    console.log(value)
+})
+
+// When this code runs, it outputs:
+// This API executed in: 500
+// It makes sense because 500 milliseconds is the shortest amount of time
+```
+
+
+### Async and Await
+
+Consider the following code using Promises to handle user login
+
+```js
+const userLogin = () => {
+    console.log("Enter Username and Password");
+    let username = prompt("Enter username: ");
+    let password = prompt("Enter password: ");
+
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            console.log("Performing user authentication");
+            if (username === "charles" && password === "kariuki"){
+                resolve("User Authenticated!");
+            }else{
+                reject("Authentication Failed!");
+            }
+        }, 1000)
+    })
+}
+
+function goToHomePage(userAuthStatus){
+    return Promise.resolve(`Go to HomePage as: ${userAuthStatus}`)
+}
+```
+
+ The user login function prompts for username and password and returns a promise. The promise contains a setTimeout function just executed after a 1000 milliseconds, which checks whether the username and the password matches. If they match, the promise is resolved If it fails the promise gets rejected
+
+Calling the userLogin Function
+```js
+userLogin().then((response) => {
+    console.log("Validated User")
+    return goToHomePage(response)
+}).then((userAuthStatus) => {
+    console.log(userAuthStatus)
+}).catch((err) => {
+    console.log(err)
+})
+
+// If user enters the correct details, this is logged:
+// Enter Username and Password
+// Performing user authentication
+// Validated User
+// Go to HomePage as: User Authenticated!
+
+// If user enters the wrong details, this is logged:
+// Enter Username and Password
+// Performing user authentication
+// Authentication Failed!
+```
+
+
+Async Await provides a more concise and readable approach to achieve the same thing
+
+When using async await, we need to wrap the async execution into the function
+
+```js
+async function performTask() {
+    const response = await userLogin();
+    console.log("Validated User")
+    const userAuthStatus = await goToHomePage(response)
+    console.log(userAuthStatus)
+}
+
+performTask()
+
+// If user enters the correct details, the output is the same as above
+// But the syntax is more concise and more readable compared to the 
+// userLogin function being called above
+// If we enter the wrong details, the execution gets into an uncaught error showing authentication failed
+```
+
+To handle the uncaught error in the async await, we can wrap the code with a try catch. We can add all our execution code in the try block. In the catch we can simply add an error and log it. Like this:
+
+```js
+  
+
+async function performTask() {
+    try {
+        const response = await userLogin();
+        console.log("Validated User")
+        const userAuthStatus = await goToHomePage(response)
+        console.log(userAuthStatus)
+    }catch(err){
+        console.log(err)
+    }
+}
+
+performTask()
+
+// If user enters the wrong details, the code will not break due to errors, instead it will log:
+// Enter Username and Password
+// Performing user authentication
+// Authentication Failed!
+```
+
+
+
+Do you remember Promise.all where we did this example:
+
+```js
+const makeApiCall = (time) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve("This API executed in: " + time);
+        }, time)
+    })
+}
+
+const apiRequests = [makeApiCall(1000), makeApiCall(2000), makeApiCall(500)]
+
+Promise.all(apiRequests).then((values) => {
+    console.log(values)
+})
+```
+
+These requests are performed simultenously where one API request does not have to wait for another to finish executing
+The equivalent async await will look like this:
+
+```js
+const makeApiCall = (time) => {
+    // We need to return a function instead of a promise
+    return () =>
+    new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve("This API executed in: " + time);
+        }, time)
+    })
+}
+
+const apiRequests = [makeApiCall(1000), makeApiCall(2000), makeApiCall(500)]
+// We use an anonymous self executing function. Like this:
+(async function() {
+    for(let request of apiRequests) {
+        console.log(await request())
+    }
+})()
+```
+
+These requests will be performed one after the other.
+Thus, when we use async await, there are some drawbacks.
+Replacing promises with async await will make you have good readable code but decrease the performance of the application.
+So the secret is to balance between using the two
+
+# Nodejs - Build Rest API CRUD PROJECT
+
+
+
