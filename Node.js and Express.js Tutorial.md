@@ -2,10 +2,10 @@
 
 ### Introduction
 
-* Node.js is an ==open source== and ==cross-platform== JavaScript runtime environment
-* Node.js runs the ==V8 JavaScript engine==, the core of Google Chrome, outside of the browser
-* A node.js app runs in a ==single process==, without creating a new thread for every request
-* Node.js uses ==event driven, non blocking I/O model== to handle concurrent requests with single thread
+* Node.js is an open source and cross-platform JavaScript runtime environment
+* Node.js runs the V8 JavaScript engine, the core of Google Chrome, outside of the browser
+* A node.js app runs in a single process, without creating a new thread for every request
+* Node.js uses event driven, non blocking I/O model to handle concurrent requests with single thread
 
 ### Why Node.js is popular
 
@@ -28,11 +28,10 @@
 
 ### Node.js vs Browser
 
-* Both Browser and Node.js use ==JavaScript== as their programming language
-* However, ==building apps== that run in the browser is ==completely different== thing from building a Node.js application
-* Browser has access to the ==DOM and Web API== while Node.js uses modules to provide access to the ==file system and OS==
-* Node.js support both the ==CommonJS require()== and ==ES module systems import()== while the browser implements ES modules standards
-* 
+* Both Browser and Node.js use JavaScript as their programming language
+* However, building apps that run in the browser is completely different thing from building a Node.js application
+* Browser has access to the DOM and Web API while Node.js uses modules to provide access to the file system and OS
+* Node.js support both the CommonJS require() and ES module systems import() while the browser implements ES modules standards
 ## JavaScript Fundamentals one should Know
 
 - Classes
@@ -48,7 +47,7 @@
 - Types
 
 ### Coding
-How to start a node js project:
+How to start a node.js project:
 1. Create a new folder for the project
 2. Navigate to the folder using terminal
 3. Type `npm init` command and enter
@@ -1195,5 +1194,122 @@ So the secret is to balance between using the two
 
 # Nodejs - Build Rest API CRUD PROJECT
 
+### Restful Api Convection
+
+<u>CRUD Actions</u>                               <u>HTTP Methods </u>                       <u> Endpoints</u>
+
+Get all movies                                GET                                         /api/movies
+
+Get movie                                       GET                                        /api/movies/:id
+
+Create movie                                  POST                                       /api/movies
+
+Update movie                                 PUT                                         /api/movies/:id
+
+Delete movie                                   DELETE                                   /api/movies/:id
+
+
+In this project, we are not going to use any of the framework or the library or the middleware. We are going to build it with pure Nodejs. The only packages we are going to use are nodemon and dotenv.
+
+
+# Getting Started with Express Framework
+
+## Express.js 
+* It is a popular node.js web application framework which provides robust set of features for building web and mobile applications.
+* It provides a thin layer of fundamental web application built on top of Nodejs features
+
+## Features offered by Express JS
+
+* Faster server-side application development
+* Provides different middleware functions that have access to the request and the response object and a next callback which is a middleware function in the application of a request response cycle
+
+```js
+var express = require('express');
+var app = express();
+
+app.get('/', function(req, res, next) {
+	next();
+})
+
+app.listen(3000);
+```
+
+* The middleware function also helps do the chaining of the routing. ie having one route that you redirect to another one
+* Routing - refers to how application endpoints url respond to the client request
+* Templating engine - Enables us to use the static template files in our application. At runtime, each template engine replaces the variables in a template file with the actual values and transforms the template into a html file that can be sent to the client. The client can see it on the browser
+* Debugging - Express uses debug module internally to log the information about the route matches, middleware functions that we use in the application mode, and the flow of the request response cycle.
+
+
+### Getting Started with Express in Coding
+* To install express in our node application, we do: `npm i express` 
+* We can create the simplest express app using a single file that is index.js or a full project using the express generator to create a sample project
+
+#### Creating simplest express app using a single file
+Example
+```js
+const express = require('express');
+const app = express();
+
+const port = 3001;
+
+// Setting the first route
+app.get("/", (req, res) => {
+    // res.send("Hello Charles");
+    // Sending response as a Json
+    res.json({ message: "Hello World" })
+})
+
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`);
+})
+
+// When we search "localhost:3001" on browser or thunderclient, we get:
+// The browser or thunderclient displays: {"message":"Hello World"}
+```
+
+
+#### Adding some routes to the simple express app
+* To do some basic routing, you have the app, then provide the http method and provide the path the client should use as an endpoint and then provide the handler
+* Example:
+
+```js
+app.get("/", (req, res) => {
+    res.json({ message: "This is Home Page" });
+})
+
+app.get("/users", (req, res) => {
+    res.json({ message: "Get all the users" });
+})
+
+app.get("/users/:id", (req, res) => {
+    res.json({ message: `Get user with ID: ${req.params.id}` });
+})
+
+app.post("/users", (req, res) => {
+    res.json({ message: "Create new users" });
+})
+
+app.put("/users/:id", (req, res) => {
+    res.json({ message: `Update user with ID: ${req.params.id}` });
+})
+
+app.delete("/users/:id", (req, res) => {
+    res.json({ message: `Delete user with ID: ${req.params.id}` });
+})
+```
+
+
+#### Using the express generator
+
+* Creates a full project of the express with template views and template engine
+* To create a project we write on the terminal `npx express-generator project-name`
+* If the generator fails to work because npm folder is missing in the App Data, you have to create it and set it to be used for global configurations and packages by running following command on terminal, `npm config set prefix c:\...\AppData\Roaming\npm`
+* Then we enter inside the project-name folder and make an npm install
+* To run the project, we use the command, `DEBUG=express-app:* npm start`
+* If it fails to run in windows, we can alternatively run it this way: `$env:DEBUG="express-app:*"; npm start`
+* Express can develop a fullstack web application
+
+
+# Understanding Express Middleware and Types
 
 
