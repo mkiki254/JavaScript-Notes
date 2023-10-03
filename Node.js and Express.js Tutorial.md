@@ -1312,4 +1312,187 @@ app.delete("/users/:id", (req, res) => {
 
 # Understanding Express Middleware and Types
 
+In express, we have five different types of middleware:
+1. Application-level middleware
+2. Third-party middleware
+3. Router-level middleware
+4. Built-in middleware
+5. Error-handling middleware
+
+Initially, we will start with a basic express application
+
+```js
+const express = require("express");
+const app = express();
+const port = 5001;
+
+// Application-level middleware
+// Third-party middleware
+// Router-level middleware
+// Built-in middleware
+// Error-handling middleware
+
+app.listen(port, () => {
+    console.log(`Server started on port ${port}`);
+})
+```
+
+Example of an application-level middleware
+
+```js
+// Application-level middleware
+const loggerMiddleware = (req, res, next) => {
+    console.log(`${new Date()} ---Request [${req.method}] [${req.url}]`);
+    next();
+}
+
+// To use it application wide
+app.use(loggerMiddleware);
+```
+
+
+Example of a Router-level middleware
+
+```js
+// First, having router from the express
+const router = express.Router();
+
+// Router-level middleware
+app.use("/api/users", router);
+
+const getUsers = (req, res) => {
+    res.json({message: "Get all users"});
+}
+
+const createUser = (req, res) => {
+    res.json({message: "Create new user"});
+}
+
+
+// Adding a simple authentication system
+const fakeAuth = (req, res, next) => {
+    const authStatus = false;
+    if(authStatus){
+        console.log("User authStatus : ", authStatus);
+        next();
+    }else {
+        res.status(401);
+        throw new Error("User is not authorized");
+    }
+}
+
+// Adding fakeAuth to router
+router.use(fakeAuth);
+
+// Creating get and post route for the two functions
+router.route("/").get(getUsers).post(createUser)
+```
+
+
+Example of error handling  middleware
+* The example converts error outputted in a html form to a json object 
+
+```js
+// Error handling middleware
+const errorHandler = (err, req, res, next) => {
+    const statusCode = res.statusCode ? res.statusCode : 500;
+    res.status(statusCode);
+    switch (statusCode) {
+        case 401:
+            res.json({
+                title: "Unauthorized",
+                message: err.message,
+            });
+            break;
+            
+        case 404:
+            res.json({
+                title: "Not Found",
+                message: err.message,
+            });
+            break;
+            
+        case 500:
+            res.json({
+                title: "Server Error",
+                message: err.message,
+            });
+            break;
+
+        default:
+            break;
+    }
+
+}
+
+// To use errorHandler as middleware in the application level
+// This line should be near the last ones after all errors have been called
+app.use(errorHandler);
+```
+
+Using a built-in middleware
+* The following example uses a built-in middleware to get data sent from the client to the server
+
+```js
+// Built-in middleware
+app.use(express.json());
+
+// In the post function, we add a line to print console log the input
+const createUser = (req, res) => {
+    console.log("This is the request body received from client : ", req.body);
+    res.json({message: "Create new user"});
+}
+
+// Outputs
+// This is the request body received from client :  { name: 'charles', profession: 'engineer' }
+```
+
+Another built in middleware if the request body is url encoded
+```js
+app.use(express.urlencoded({extended: true}));
+```
+
+
+Another built in middleware used when sending static files like images to the client
+```js
+// importing path
+const path = require("path");
+
+// Using the middleware
+app.use(express.static(path.join(__dirname, "public")));
+
+// If we wish to change the path to static
+app.use("/static", express.static(path.join(__dirname, "public")))
+```
+
+
+Example of third party middles
+1. morgan - used for logging. Downloaded using `npm i morgon`
+2. multer - used to upload files to the server. Downloaded using `npm i multer`
+
+morgan
+* Import morgan using `const logger = require("morgan");`
+* To use it, write `app.use(logger("dev"));`
+* It has options like dev and combined. combined has more details.
+
+multer 
+* Import multer using `const multer = require("multer");`
+* To use it, write  `const upload = multer({dest: "./public/uploads" })`
+* The above line creates the uploads folder automatically after changes are saved
+* To upload images to the folder, lets write an endpoint
+
+Adding the endpoint for making the uploads
+```js
+// Endpoint for making uploads
+app.post("/upload", upload.single("image"), (req, res, next) => {
+    console.log(req.file, req.body);
+    // Sending the same file we have uploaded as response
+    res.send(req.file);
+}, (err, req, res, next) => {
+    res.status("400").send({err: error.message})
+})
+```
+
+
+# Express and MongoDB API Project
 
