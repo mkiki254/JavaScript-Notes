@@ -1496,3 +1496,29 @@ app.post("/upload", upload.single("image"), (req, res, next) => {
 
 # Express and MongoDB API Project
 
+To have a clean project, we use different folder structures for different implementations. These include:
+1. Route folder - for all the routes
+2. Controllers - for all the logic
+3. Middleware - contains application level middleware such as error handler.
+4. Config - To have configurations such as those for creating connections with mongodb database
+5. Models - To define model schemas
+
+An alternative of the `try..catch` block in express is using express-async-handler that handles exceptions inside async express routes. To install it, we do `npm i express-async-handler`
+We use it like this:
+```js
+// Importing async handler
+const asyncHandler = require("express-async-handler");
+
+// Wrapping it around a block 
+const getContacts = asyncHandler(async (req, res) => {
+    res.status(200).json({message: "Get all contacts" });
+});
+```
+
+#### MongoDB SetUp
+
+To connect to the mongodb database, we need mongoose. To install it, we say:
+`npm i mongoose`
+
+# JWT User Authentication and Protecting Routes
+
